@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @font-face {
+            font-family: "poppins";
+            src: url(fonds/Poppins-Regular.ttf);
+        }
+
+        body {
+            background-color: rgb(253, 210, 247);
+
+        }
+
+        .bord {
+            width: 450px;
+            height: 450px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: auto auto auto;
+
+        }
+
+        #restartbtn {
+            border: none;
+            font-size: 18px;
+            border-radius: 5px;
+            color: rgb(255 255 255);
+            width: 84px;
+            height: 47px;
+            cursor: pointer;
+            background-color: #a51d8a;
+
+        }
+
+        .clum {
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ffffff;
+            font-size: 87px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "poppins";
+            cursor: pointer;
+            border-radius: 5px;
+            color: #ffffff;
+            box-shadow: 1px 1px 3px #000000;
+            background-color: #000000;
+        }
+
+        .clum:hover {
+            background-color: rgb(255, 255, 255);
+            color: #000000;
+        }
+
+        .parent {
+            font-family: "poppins";
+            text-align: center;
+        }
+
+        #blkbox {
+            display: flex;
+            width: 40%;
+            height: 100vh;
+            background: black;
+            z-index: 10;
+            position: absolute;
+            top: 0px;
+            right: 457px;
+            opacity: 0.85;
+            color: rgb(255, 255, 255);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+
+        #winRest {
+            font-size: 18px;
+            border-radius: 5px;
+            background: none;
+            border: 2px solid rgb(255, 255, 255);
+            color: rgb(255, 255, 255);
+            width: 84px;
+            height: 47px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="parent">
+        <h1>Tic Tac Toe</h1>
+        <div class="bord">
+            <div cellIndex="0" class="clum"></div>
+            <div cellIndex="1" class="clum"></div>
+            <div cellIndex="2" class="clum"></div>
+            <div cellIndex="3" class="clum"></div>
+            <div cellIndex="4" class="clum"></div>
+            <div cellIndex="5" class="clum"></div>
+            <div cellIndex="6" class="clum"></div>
+            <div cellIndex="7" class="clum"></div>
+            <div cellIndex="8" class="clum"></div>
+        </div>
+        <h3 id="text"></h3>
+        <button id="restartbtn">Restart</button>
+        <script>
+            //win conditions//
+            var win = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
+
+            var options = ["", "", "", "", "", "", "", "", ""];
+            var clum = document.querySelectorAll(".clum");
+            var text = document.getElementById("text");
+            var restart = document.getElementById("restartbtn");
+            var currentplayer = "X";
+            restart.addEventListener("click", restartfn);
+            var running = false;
+
+
+
+            mainfn();
+
+            function mainfn() {
+                clum.forEach((cell) => cell.addEventListener("click", clumfn));
+                text.innerHTML = `${currentplayer}'s turn`;
+                running = true;
+            }
+
+            //click function//
+
+            function clumfn() {
+                var clumindex = this.getAttribute("cellIndex");
+                console.log(clumindex);
+                if (options[clumindex] !== "" || !running) {
+                    return;
+                }
+                updateFn(this, clumindex);
+                sltWinner();
+                if (running) {
+                    changeplayer();
+                }
+            }
+
+
+
+            function updateFn(cel, index) {
+                options[index] = currentplayer;
+                cel.innerHTML = currentplayer;
+            }
+
+            //player changing function//
+
+            function changeplayer() {
+                currentplayer = (currentplayer == "X") ? "O" : "X";
+                text.innerHTML = `${currentplayer}'s turn`;
+            }
+
+            //winner selecting function//
+
+            function sltWinner() {
+                let winner = false;
+
+                for (i = 0; i < win.length; i++) {
+                    const condition = win[i];
+                    const clumA = options[condition[0]]; //["x","o",.......]
+                    const clumB = options[condition[1]];
+                    const clumC = options[condition[2]];
+
+
+
+                    if (clumA == "" || clumB == "" || clumC == "") {
+                        continue;
+                    }
+
+                    //win conditon //
+                    if (clumA == clumB && clumB == clumC) {
+                        winner = true;
+                        break;
+                    }
+                }
+
+                //result display//
+                if (winner) {
+                    var blkbox = document.createElement("div")
+                    blkbox.setAttribute("id", "blkbox")
+                    document.body.appendChild(blkbox)
+
+                    var wintext = document.createElement("h1")
+                    blkbox.appendChild(wintext)
+                    wintext.style.fontSize = "72px";
+                    wintext.innerHTML = `${currentplayer} is Win!`;
+
+                    var restartt = document.createElement("button")
+                    restartt.setAttribute("id", "winRest")
+                    restartt.innerHTML = "Restart"
+
+                    restartt.addEventListener("click", restartfnn);
+                    blkbox.appendChild(restartt)
+
+
+
+
+                    // if there are no colums left//
+                    running = false;
+                } else if (!options.includes("")) {
+                    text.innerHTML = `Draw!`;
+                    running = false;
+                }
+            }
+
+
+            // To restart before winning the game//
+            function restartfn() {
+                options = ["", "", "", "", "", "", "", "", ""];
+                currentplayer = "X";
+                running = true;
+                clum.forEach((cell) => (cell.innerHTML = ""));
+                text.innerHTML = `${currentplayer}'s turn`;
+            }
+
+            // To restart after winning the game//
+
+            function restartfnn() {
+                options = ["", "", "", "", "", "", "", "", ""];
+                currentplayer = "X";
+                running = true;
+                clum.forEach((cell) => (cell.innerHTML = ""));
+                text.innerHTML = `${currentplayer}'s turn`;
+                document.getElementById("blkbox").remove();
+            }
+
+        </script>
+    </div>
+</body>
+
+</html>
